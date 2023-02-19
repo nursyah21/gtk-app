@@ -46,13 +46,16 @@ static enum MHD_Result ahc_echo(
   ret = MHD_queue_response (
     connection, MHD_HTTP_OK, response
   );
+  MHD_destroy_response(response);
 
   return ret;
 }
   
 
-static void run_server ()
+static void run_server (GtkWidget *widget, gpointer data)
 {
+  g_print("run server in localhost:%d\n", PORT);
+
   struct MHD_Daemon *d;
   d = MHD_start_daemon(
     MHD_USE_THREAD_PER_CONNECTION,
@@ -66,25 +69,27 @@ static void run_server ()
 
   if (d == NULL)
   {
-    g_print("error: run server\n");
+    g_print("error: run server in localhost:%d\n", PORT);
   }
 
   (void) getc (stdin);
   MHD_stop_daemon(d);
-
-  g_print("run server\n");
 }
 
 static void activate (GtkApplication *app, gpointer user_data)
 {
   GtkWidget *window;
+  GtkWidget *button;
 
   window = gtk_application_window_new (app);
   gtk_window_set_title (GTK_WINDOW (window), "window");
   gtk_window_set_default_size (GTK_WINDOW (window), 200, 200);
-  gtk_window_present (GTK_WINDOW (window));
 
-  run_server();
+  button = gtk_button_new_with_label ("run server");
+  g_signal_connect (button, "clicked", G_CALLBACK (run_server), NULL);
+  gtk_window_set_child (GTK_WINDOW (window), button);
+
+  gtk_window_present (GTK_WINDOW (window));
 }
 
 int main (int argc, char **argv)
