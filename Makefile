@@ -1,10 +1,10 @@
-file=sfml_1.cpp
+file=sfml_2.cpp
 
 run: builds
 	./app
 
 builds:
-	g++ ${file} -o app `pkg-config --libs sfml-all`
+	g++-11 ${file} -o app `pkg-config --static --libs sfml-all gl`
 
 
 # gflw and glad
