@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
 
 #define PAGE "<html><head><title>libmicrohttpd demo</title>"\
              "</head><body>libmicrohttpd demo</body></html>"
 
 #define PORT 5000
+
+bool serverrun_bool = false;
+pthread_t t1;
 
 static enum MHD_Result ahc_echo(
   void *cls, 
@@ -51,8 +56,7 @@ static enum MHD_Result ahc_echo(
   return ret;
 }
   
-
-static void run_server (GtkWidget *widget, gpointer data)
+void *run_server_thread(void *vargp)
 {
   g_print("run server in localhost:%d\n", PORT);
 
@@ -76,8 +80,26 @@ static void run_server (GtkWidget *widget, gpointer data)
   MHD_stop_daemon(d);
 }
 
+static void run_server (GtkWidget *widget, gpointer data)
+{
+  if(serverrun_bool == false){
+    pthread_create(&t1, NULL, run_server_thread, NULL);
+  }
+}
+
+
+void *test(void *vargp){
+  for(int i=0; i < 10; i++){
+    sleep(1);
+    g_print("%d\n",i);
+  }
+}
+
 static void activate (GtkApplication *app, gpointer user_data)
 {
+  // pthread_t t1;
+  // pthread_create(&t1, NULL, test, NULL);
+  
   GtkWidget *window;
   GtkWidget *button;
 
@@ -85,7 +107,14 @@ static void activate (GtkApplication *app, gpointer user_data)
   gtk_window_set_title (GTK_WINDOW (window), "window");
   gtk_window_set_default_size (GTK_WINDOW (window), 200, 200);
 
-  button = gtk_button_new_with_label ("run server");
+  if(!serverrun_bool)
+  {
+    button = gtk_button_new_with_label ("run server");
+  }else
+  {
+    button = gtk_button_new_with_label ("stop server");
+  }
+
   g_signal_connect (button, "clicked", G_CALLBACK (run_server), NULL);
   gtk_window_set_child (GTK_WINDOW (window), button);
 
@@ -99,9 +128,11 @@ int main (int argc, char **argv)
 
   app = gtk_application_new ("org.example", G_APPLICATION_DEFAULT_FLAGS);
   g_print ("application run\n");
+  
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
   status = g_application_run (G_APPLICATION (app), argc, argv);
   g_object_unref(app);
 
+  
   return status;
 }
