@@ -4,7 +4,15 @@
 
 <https://www.gtk.org/docs/installations/>
 
+<https://www.glfw.org/download.html>
+
+<https://learnopengl.com/Getting-started/Creating-a-window>
+
+<https://www.openal.org/documentation/>
+
 ## getting started
+
+<https://www.glfw.org/documentation.html>
 
 <https://www.gtk.org/docs/getting-started/hello-world/>
 
